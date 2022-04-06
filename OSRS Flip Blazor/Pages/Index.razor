@@ -1,0 +1,40 @@
+﻿@page "/"
+
+<h1>OSRS Flipping Calc</h1>
+
+<h3>Flip History</h3>
+
+<div class="table-responsive table-hover">
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Buy</th>
+      <th scope="col">Sell</th>
+      <th scope="col">Margin</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Profit</th>
+    </tr>
+  </thead>
+  <tbody>
+      @foreach (var flip in flips)
+   {
+     <tr>
+      <th scope="row">1</th>
+      <td>@flip.ItemName</td>
+      <td>@flip.BuyPrice</td>
+      <td>@flip.SellPrice</td>
+      <td>@(flip.SellPrice - @flip.BuyPrice)</td>
+      <td>@flip.Quantity</td>
+      <td>@((flip.SellPrice - @flip.BuyPrice) * flip.Quantity)</td>
+    </tr>
+   }
+  </tbody>
+</table>
+</div>
+
+
+@code{
+    private List<Flip> flips = new();
+}
