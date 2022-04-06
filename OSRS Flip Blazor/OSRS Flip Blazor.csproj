@@ -7,4 +7,8 @@
     <RootNamespace>OSRS_Flip_Blazor</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Sounds\" />
+  </ItemGroup>
+
 </Project>

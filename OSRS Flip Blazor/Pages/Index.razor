@@ -1,9 +1,34 @@
 ﻿@page "/"
+<div class="mx-auto" style="width: 500px;">
+  <h1>OSRS FLIP TRACKER</h1>
+</div>
+<h3>Enter a flip</h3>
+<form>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Item Name</label>
+    <input type="text" class="form-control" placeholder="Dragon Dart" @bind="newItemName">
+  </div>  
+  <div class="form-group">
+    <label for="exampleInputEmail1">Buy Price</label>
+    <input type="number" class="form-control" placeholder="1200" @bind="newBuyPrice">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Sell Price</label>
+    <input type="number" class="form-control" placeholder="1300" @bind="newSellPrice">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Quatity</label>
+    <input type="number" class="form-control" placeholder="11000" @bind="newQuantity">
+  </div>
+  <button @onclick="CalculateFlip" type="button" class="btn btn-success mt-2">Calculate</button>
+  <button @onClick="AddFlip" type="submit" class="btn btn-primary mt-2">Submit</button>
+</form>
 
-<h1>OSRS Flipping Calc</h1>
+<span><p><b>Margin: </b>@newMargin<b>Profit: </b>@newProfit</p></span>
 
+<br />
+<br />
 <h3>Flip History</h3>
-
 <div class="table-responsive table-hover">
 <table class="table">
   <thead>
@@ -36,5 +61,21 @@
 
 
 @code{
+    public string? newItemName;
+    private int newBuyPrice;
+    private int newSellPrice;
+    private int newQuantity;
+
+    private int newMargin;
+    private int newProfit;
+
+    private void CalculateFlip()
+    {
+        newMargin = newSellPrice - newBuyPrice;
+        newProfit = newQuantity * newMargin;
+    }
+
     private List<Flip> flips = new();
+
+
 }
