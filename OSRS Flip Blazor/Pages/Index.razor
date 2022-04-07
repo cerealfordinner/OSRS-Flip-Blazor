@@ -20,11 +20,13 @@
     <label for="exampleInputEmail1">Quatity</label>
     <input type="number" class="form-control" placeholder="11000" @bind="newQuantity">
   </div>
-  <button @onclick="CalculateFlip" type="button" class="btn btn-success mt-2">Calculate</button>
-  <button @onClick="AddFlip" type="submit" class="btn btn-primary mt-2">Submit</button>
+  <div class="float-end">
+      <button @onclick="CalculateFlip" type="button" class="btn btn-success mt-2">Calculate</button>
+      <button @onclick="AddFlip" type="button" class="btn btn-primary mt-2">Submit</button>
+  </div>
 </form>
 
-<span><p><b>Margin: </b>@newMargin<b>Profit: </b>@newProfit</p></span>
+<span><b>Margin: </b>@newMargin<b>Profit: </b>@newProfit</span>
 
 <br />
 <br />
@@ -69,13 +71,22 @@
     private int newMargin;
     private int newProfit;
 
+    private List<Flip> flips = new();
+
     private void CalculateFlip()
     {
         newMargin = newSellPrice - newBuyPrice;
         newProfit = newQuantity * newMargin;
     }
 
-    private List<Flip> flips = new();
-
-
-}
+    private void AddFlip()
+    {
+        if (!string.IsNullOrWhiteSpace(newItemName)){
+           flips.Add(new Flip(newItemName, newBuyPrice, newSellPrice, newQuantity));
+                newItemName =  string.Empty;
+                newBuyPrice =  0;
+                newSellPrice =  0;
+                newQuantity =  0;
+        }
+    }
+    }
