@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using OSRS_Flip_Blazor.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,8 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContext<FlipDbContext>(o => o.UseSqlite("filename=Data/Database/Flip.db"));
+builder.Services.AddMudServices();
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

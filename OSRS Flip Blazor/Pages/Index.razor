@@ -1,5 +1,4 @@
 ﻿@page "/"
-@model IndexModel
 <div class="mx-auto" style="width: 500px;">
   <h1>OSRS FLIP TRACKER</h1>
 </div>
@@ -61,13 +60,6 @@
   </tbody>
 </table>
 </div>
-<div>
-    @if(Model.Flips.Count() == 0)
-    {
-        <p class="text-center">No flips to display</p>
-    }
-</div>
-
 
 @code{
     public string? newItemName;
