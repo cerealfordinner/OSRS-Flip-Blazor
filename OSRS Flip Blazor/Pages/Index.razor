@@ -1,71 +1,83 @@
 ﻿@page "/"
+@using OSRS_Flip_Blazor.Data
+@using Microsoft.EntityFrameworkCore
+
 <div class="mx-auto" style="width: 500px;">
-  <h1>OSRS FLIP TRACKER</h1>
+    <h1>OSRS FLIP TRACKER</h1>
 </div>
 <h3>Enter a flip</h3>
-<form>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Item Name</label>
-    <input type="text" class="form-control" placeholder="Dragon Dart" @bind="newItemName">
-  </div>  
-  <div class="form-group">
-    <label for="exampleInputEmail1">Buy Price</label>
-    <input type="number" class="form-control" placeholder="1200" @bind="newBuyPrice">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Sell Price</label>
-    <input type="number" class="form-control" placeholder="1300" @bind="newSellPrice">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputEmail1">Quatity</label>
-    <input type="number" class="form-control" placeholder="11000" @bind="newQuantity">
-  </div>
-  <div class="float-end">
-      <button @onclick="CalculateFlip" type="button" class="btn btn-success mt-2">Calculate</button>
-      <button @onclick="AddFlip" type="button" class="btn btn-primary mt-2">Submit</button>
-  </div>
-</form>
+
+<div>
+    <EditForm Model="_flipToCreate" OnInvalidSubmit="CreateFlip">
+        <div class="form-group mb-3">
+            <label for="newItemName">Name</label>
+            <InputText @bind-Value="_flipToCreate.ItemName" class="form-control" id="flipName"></InputText>
+        </div>
+        <div class="form-group mb-3">
+            <label for="newItemName">Buy</label>
+            <InputNumber @bind-Value="_flipToCreate.BuyPrice" class="form-control" id="flipBuy"></InputNumber>
+        </div>
+        <div class="form-group mb-3">
+            <label for="newItemName">Sell</label>
+            <InputNumber @bind-Value="_flipToCreate.SellPrice" class="form-control" id="flipSell"></InputNumber>
+        </div>
+        <div class="form-group mb-3">
+            <label for="newItemName">Quantity</label>
+            <InputNumber @bind-Value="_flipToCreate.Quantity" class="form-control" id="flipQuantity"></InputNumber>
+        </div>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <button @onclick="CreateFlip" type="submit" class="btn btn-success">Save</button>
+        <button @onclick="CalculateFlip" class="btn btn-secondary">Calculate</button>
+
+    </EditForm>
+</div>
+
 
 <span><b>Margin: </b>@newMargin<b>Profit: </b>@newProfit</span>
 
 <br />
 <br />
 <h3>Flip History</h3>
-<div class="table-responsive table-hover">
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Buy</th>
-      <th scope="col">Sell</th>
-      <th scope="col">Margin</th>
-      <th scope="col">Quantity</th>
-      <th scope="col">Profit</th>
-    </tr>
-  </thead>
-  <tbody>
-      @foreach (var flip in flips)
-   {
-     <tr>
-      <th scope="row">1</th>
-      <td>@flip.ItemName</td>
-      <td>@flip.BuyPrice</td>
-      <td>@flip.SellPrice</td>
-      <td>@(flip.SellPrice - @flip.BuyPrice)</td>
-      <td>@flip.Quantity</td>
-      <td>@((flip.SellPrice - @flip.BuyPrice) * flip.Quantity)</td>
-    </tr>
-   }
-  </tbody>
-</table>
+<div>
+    <table class="table-responsive table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Item Name</th>
+                <th scope="col">Buy</th>
+                <th scope="col">Sell</th>
+                <th scope="col">Margin</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Profit</th>
+                <th scope="col">CRUD</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (flips != null)
+            {
+                foreach (var flip in _flips)
+                {
+                    <tr>
+                        <th scope="row">@flip.Id</th>
+                        <td>@flip.ItemName</td>
+                        <td>@flip.BuyPrice</td>
+                        <td>@flip.SellPrice</td>
+                        <td>@flip.Margin</td>
+                        <td>@flip.Quantity</td>
+                        <td>@flip.Profit</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => DeleteFlip(flip)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
 </div>
 
-@code{
-    public string? newItemName;
-    private int newBuyPrice;
-    private int newSellPrice;
-    private int newQuantity;
+@code {
 
     private int newMargin;
     private int newProfit;
@@ -74,20 +86,43 @@
 
     private void CalculateFlip()
     {
-        newMargin = newSellPrice - newBuyPrice;
-        newProfit = newQuantity * newMargin;
+        newMargin = _flipToCreate.SellPrice - _flipToCreate.BuyPrice;
+        newProfit = _flipToCreate.Quantity * newMargin;
     }
 
-    private void AddFlip()
+    [Inject] FlipDbContext FlipDbContext { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    private List<Flip> _flips = new List<Flip>();
+
+    protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrWhiteSpace(newItemName)){
-           flips.Add(new Flip(newItemName, newBuyPrice, newSellPrice, newQuantity));
-                newItemName =  string.Empty;
-                newBuyPrice =  0;
-                newSellPrice =  0;
-                newQuantity =  0;
-        }
+        _flips = await FlipDbContext.Flips.ToListAsync();
     }
 
+    private async Task DeleteFlip(Flip flipToDelete)
+    {
+        FlipDbContext.Flips.Remove(flipToDelete);
+        await FlipDbContext.SaveChangesAsync();
+        _flips.Remove(flipToDelete);
+        StateHasChanged();
+    }
+
+    private Flip _flipToCreate = new Flip
+        {
+            ItemName = "Test"
+        };
+
+    private async Task CreateFlip()
+    {
+        await FlipDbContext.Flips.AddAsync(_flipToCreate);
+        await FlipDbContext.SaveChangesAsync();
+        StateHasChanged();
+        _flipToCreate.ItemName = "Item name";
+        _flipToCreate.BuyPrice = 0;
+        _flipToCreate.SellPrice = 0;
+        _flipToCreate.Quantity = 0;
+
+    }
 
     }

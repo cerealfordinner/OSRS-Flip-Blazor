@@ -13,27 +13,5 @@ namespace OSRS_Flip_Blazor.Models
         public int Quantity { get; set; }
         public int Margin { get; set; }
         public int Profit { get; set; }
-
-        public Flip(string itemName, int buyPrice, int sellPrice, int quantity)
-        {
-            ItemName = itemName;
-            BuyPrice = buyPrice;
-            SellPrice = sellPrice;
-            Quantity = quantity;
-        }
-    }
-    public class IndexModel : PageModel
-    {
-        public readonly FlipDbContext _context;
-
-        public IndexModel(FlipDbContext context) => _context = context;
-
-        public async void OnGet()
-        {
-            Flips = await _context.Flips.ToListAsync();
-        }
-
-        public IEnumerable<Flip> Flips { get; set; } = Enumerable.Empty<Flip>();
-
     }
 }
